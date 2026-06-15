@@ -539,3 +539,12 @@ input {
     display: none !important;
   }
 }
+@media (max-width: 1400px) {
+  .gc-sidebar {
+    display: none !important;
+  }
+
+  .gc-mobile-ecosystems {
+    display: block !important;
+  }
+}
