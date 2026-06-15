@@ -725,8 +725,3 @@ input {
     flex-basis: 100%;
   }
 }
-@media (max-width: 640px) {
-  .gc-page {
-    border: 6px solid red !important;
-  }
-}
