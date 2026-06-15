@@ -207,6 +207,17 @@ function HomePageContent() {
 
         <section className="gc-content">
           <section className="gc-mobile-ecosystems">
+            <div
+  style={{
+    background: "red",
+    color: "white",
+    padding: "20px",
+    fontSize: "30px",
+    fontWeight: "bold",
+  }}
+>
+  MOBİL TEST KUTUSU
+</div>
             <div className="gc-mobile-section-label">EKOSİSTEMLER</div>
 
             <div className="gc-mobile-ecosystem-grid">
