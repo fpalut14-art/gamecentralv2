@@ -20,13 +20,13 @@ type Props = {
   logout: () => void;
 };
 
-const mobileEcosystems = [
-  { icon: "🖥️", label: "Sistemler", href: "/?q=Sistemler" },
-  { icon: "🎮", label: "Oyun Dünyası", href: "/?q=Oyun" },
-  { icon: "⌨️", label: "Ekipmanlar", href: "/?q=Ekipman" },
-  { icon: "🪑", label: "Yaşam Alanı", href: "/?q=Koltuk" },
-  { icon: "💎", label: "Dijital", href: "/?q=Valorant" },
-  { icon: "🏪", label: "Oyun Marketi", href: "/?q=Market" },
+const ecosystems = [
+  { icon: "🖥️", title: "Sistemler", href: "/?q=Sistemler" },
+  { icon: "🎮", title: "Oyun Dünyası", href: "/?q=Oyun" },
+  { icon: "⌨️", title: "Ekipmanlar", href: "/?q=Ekipman" },
+  { icon: "🪑", title: "Yaşam Alanı", href: "/?q=Koltuk" },
+  { icon: "💎", title: "Dijital", href: "/?q=Valorant" },
+  { icon: "🏪", title: "Oyun Marketi", href: "/?q=Market" },
 ];
 
 export default function MobileHeader({
@@ -40,7 +40,6 @@ export default function MobileHeader({
   handleSearch,
   markNotificationRead,
   markAllNotificationsRead,
-  logout,
 }: Props) {
   const unreadCount = notifications.filter((item) => !item.read).length;
 
@@ -100,26 +99,6 @@ export default function MobileHeader({
         />
       </form>
 
-      <div className="gc-mobile-action-row">
-        <Link href="/create" className="gc-mobile-create-main">
-          + Yeni İlan
-        </Link>
-
-        {!user ? (
-          <Link href="/register" className="gc-mobile-register-main">
-            Kayıt Ol
-          </Link>
-        ) : (
-          <button
-            type="button"
-            onClick={logout}
-            className="gc-mobile-logout-main"
-          >
-            Çıkış
-          </button>
-        )}
-      </div>
-
       <section className="gc-mobile-ecosystem-strip">
         <div className="gc-mobile-strip-head">
           <span>EKOSİSTEMLER</span>
@@ -127,30 +106,18 @@ export default function MobileHeader({
         </div>
 
         <div className="gc-mobile-ecosystem-scroll">
-          {mobileEcosystems.map((item) => (
+          {ecosystems.map((item) => (
             <Link
-              key={item.label}
+              key={item.title}
               href={item.href}
               className="gc-mobile-ecosystem-pill"
             >
               <span>{item.icon}</span>
-              <strong>{item.label}</strong>
+              <strong>{item.title}</strong>
             </Link>
           ))}
         </div>
       </section>
-
-      <nav className="gc-mobile-shortcuts">
-        <Link href="/messages">Mesajlar</Link>
-        <Link href="/support">Destek</Link>
-        <Link href="/my-orders">Siparişler</Link>
-
-        {(profile?.role === "seller" || profile?.role === "admin") && (
-          <Link href="/seller">Satıcı</Link>
-        )}
-
-        {profile?.role === "admin" && <Link href="/admin">Admin</Link>}
-      </nav>
     </header>
   );
 }

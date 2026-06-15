@@ -49,11 +49,7 @@ export default function Header() {
 
   async function loadNotifications(uid: string) {
     try {
-      const q = query(
-        collection(db, "notifications"),
-        where("userId", "==", uid)
-      );
-
+      const q = query(collection(db, "notifications"), where("userId", "==", uid));
       const snap = await getDocs(q);
 
       const data = snap.docs
@@ -139,7 +135,6 @@ export default function Header() {
       await loadNotifications(user.uid);
     } catch (error) {
       console.error("Bildirim okundu yapılamadı:", error);
-      alert("Bildirim güncellenemedi.");
     }
   }
 
@@ -161,7 +156,6 @@ export default function Header() {
       await loadNotifications(user.uid);
     } catch (error) {
       console.error("Bildirimler okundu yapılamadı:", error);
-      alert("Bildirimler güncellenemedi.");
     }
   }
 
@@ -185,11 +179,7 @@ export default function Header() {
     <>
       <DesktopHeader {...sharedProps} />
       <MobileHeader {...sharedProps} />
-
-      <MobileBottomActions
-        isLoggedIn={!!user}
-        role={profile?.role}
-      />
+      <MobileBottomActions isLoggedIn={!!user} role={profile?.role} />
     </>
   );
 }
