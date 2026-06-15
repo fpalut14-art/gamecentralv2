@@ -30,176 +30,6 @@ input {
   overflow-x: hidden;
 }
 
-.gc-header {
-  min-height: 82px;
-  border-bottom: 1px solid rgba(255, 255, 255, .07);
-  display: grid;
-  grid-template-columns: 300px minmax(280px, 560px) auto;
-  align-items: center;
-  gap: 24px;
-  padding: 14px 40px;
-  background: rgba(0, 0, 0, .94);
-  backdrop-filter: blur(18px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.gc-logo {
-  font-family: Orbitron, sans-serif;
-  font-size: 30px;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 1px;
-  white-space: nowrap;
-}
-
-.gc-logo span {
-  color: #ffd400;
-  text-shadow: 0 0 18px rgba(255, 212, 0, .45);
-}
-
-.gc-search input {
-  width: 100%;
-  height: 48px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, .09);
-  background: linear-gradient(180deg, #0d0f16, #080910);
-  padding: 0 18px;
-  color: #fff;
-  outline: none;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.gc-auth-group {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, .035);
-  border: 1px solid rgba(255, 255, 255, .08);
-  max-width: 100%;
-}
-
-.gc-login-link,
-.gc-register-link,
-.gc-user-link,
-.gc-logout-btn,
-.gc-notification-btn {
-  min-height: 38px;
-  padding: 0 12px;
-  border-radius: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  border: 0;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.gc-login-link {
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, .22);
-  background: rgba(255, 255, 255, .035);
-}
-
-.gc-register-link,
-.gc-user-link.seller {
-  color: #050505;
-  background: #ffd400;
-}
-
-.gc-user-menu {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.gc-user-name {
-  max-width: 220px;
-  color: #ffd400;
-  font-weight: 900;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.gc-user-link {
-  color: #cbd5e1;
-  background: rgba(255, 255, 255, .04);
-}
-
-.gc-logout-btn {
-  background: rgba(255, 255, 255, .04);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, .16);
-}
-
-.gc-notification-btn {
-  position: relative;
-  color: #ffd400;
-  background: rgba(255, 212, 0, .08);
-  border: 1px solid rgba(255, 212, 0, .28);
-}
-
-.gc-notification-count {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  background: #ef4444;
-  color: white;
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-}
-
-.gc-notification-panel {
-  position: absolute;
-  top: 72px;
-  right: 40px;
-  width: 360px;
-  max-width: calc(100vw - 28px);
-  max-height: 460px;
-  overflow-y: auto;
-  z-index: 999;
-  border-radius: 18px;
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, .1);
-  box-shadow: 0 28px 90px rgba(0, 0, 0, .55);
-  padding: 14px;
-}
-
-.gc-notification-item {
-  margin-top: 10px;
-  padding: 14px;
-  border-radius: 14px;
-  background: rgba(255, 212, 0, .08);
-  border: 1px solid rgba(255, 212, 0, .18);
-}
-
-.gc-notification-item.read {
-  opacity: .7;
-  background: rgba(255, 255, 255, .035);
-  border-color: rgba(255, 255, 255, .06);
-}
-
-.gc-notification-item strong {
-  color: #ffd400;
-}
-
-.gc-notification-item p {
-  color: #cbd5e1;
-  margin: 6px 0;
-}
-
 .gc-layout {
   width: min(1700px, calc(100% - 60px));
   margin: 30px auto;
@@ -274,6 +104,10 @@ input {
   display: grid;
   gap: 34px;
   min-width: 0;
+}
+
+.gc-mobile-ecosystems {
+  display: none;
 }
 
 .gc-hero-area {
@@ -525,18 +359,6 @@ input {
 
 /* Tablet */
 @media (max-width: 1200px) {
-  .gc-header {
-    grid-template-columns: 1fr;
-    height: auto;
-    padding: 18px 22px;
-  }
-
-  .gc-auth-group {
-    justify-self: start;
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
   .gc-layout,
   .gc-hero-area {
     grid-template-columns: 1fr;
@@ -548,87 +370,77 @@ input {
 }
 
 /* Mobile */
-@media (max-width: 640px) {
-  .gc-header {
-    position: relative;
-    padding: 16px 14px;
-    gap: 14px;
-  }
-
-  .gc-logo {
-    font-size: 24px;
-    text-align: center;
-  }
-
-  .gc-search input {
-    height: 44px;
-    font-size: 15px;
-    border-radius: 13px;
-  }
-
-  .gc-auth-group,
-  .gc-user-menu {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .gc-login-link,
-  .gc-register-link,
-  .gc-user-link,
-  .gc-logout-btn,
-  .gc-notification-btn {
-    flex: 1 1 calc(50% - 8px);
-    min-width: 0;
-    font-size: 13px;
-    padding: 0 8px;
-  }
-
-  .gc-user-name {
-    flex: 1 1 100%;
-    max-width: 100%;
-    text-align: center;
-  }
-
-  .gc-notification-panel {
-    top: 150px;
-    left: 14px;
-    right: 14px;
-    width: auto;
-  }
-
+@media (max-width: 900px) {
   .gc-layout {
     width: calc(100% - 24px);
     margin: 18px auto;
+    grid-template-columns: 1fr;
     gap: 18px;
   }
 
   .gc-sidebar {
-    order: 2;
-    gap: 14px;
+    display: none !important;
   }
 
   .gc-content {
-    order: 1;
     gap: 20px;
   }
 
-  .gc-sidebar-box {
-    padding: 18px;
-    border-radius: 18px;
-    gap: 14px;
+  .gc-mobile-ecosystems {
+    display: block !important;
   }
 
-  .gc-create-btn {
-    min-height: 54px;
-    border-radius: 15px;
+  .gc-mobile-section-label {
+    margin-bottom: 12px;
+    color: #ffd400;
+    font-family: Orbitron, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .gc-mobile-ecosystem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .gc-mobile-ecosystem-card {
+    min-height: 86px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 212, 0, 0.22);
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(8, 10, 18, 0.96));
+    color: #fff;
+    display: grid;
+    place-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .gc-mobile-ecosystem-card span {
+    font-size: 26px;
+  }
+
+  .gc-mobile-ecosystem-card strong {
+    font-size: 14px;
+    font-family: Orbitron, sans-serif;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .gc-mobile-ecosystem-card.selected {
+    background: #ffd400;
+    color: #050505;
+    border-color: #ffd400;
   }
 
   .gc-hero-area {
     gap: 16px;
+    margin-top: 0;
   }
 
   .gc-hero {
-    height: 360px;
+    height: 330px;
     border-radius: 20px;
   }
 
@@ -639,12 +451,12 @@ input {
   }
 
   .gc-hero h1 {
-    font-size: 34px;
+    font-size: 30px;
     line-height: 1;
   }
 
   .gc-hero p {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .gc-hero-btn {
@@ -654,11 +466,7 @@ input {
   }
 
   .gc-right-banners {
-    grid-template-columns: 1fr;
-  }
-
-  .gc-right-ad {
-    min-height: 92px;
+    display: none;
   }
 
   .gc-products,
@@ -701,92 +509,23 @@ input {
 
 /* Small phones */
 @media (max-width: 390px) {
-  .gc-logo {
-    font-size: 21px;
-  }
-
   .gc-hero {
-    height: 330px;
+    height: 310px;
   }
 
   .gc-hero h1 {
-    font-size: 29px;
+    font-size: 27px;
   }
 
   .gc-hero p {
     font-size: 15px;
   }
 
-  .gc-login-link,
-  .gc-register-link,
-  .gc-user-link,
-  .gc-logout-btn,
-  .gc-notification-btn {
-    flex-basis: 100%;
-  }
-}
-.gc-mobile-ecosystems {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .gc-sidebar {
-    display: none !important;
-  }
-
-  .gc-mobile-ecosystems {
-    display: block;
-  }
-
-  .gc-mobile-section-label {
-    margin-bottom: 12px;
-    color: #ffd400;
-    font-family: Orbitron, sans-serif;
-    font-size: 14px;
-    font-weight: 900;
-    letter-spacing: 1px;
-  }
-
-  .gc-mobile-ecosystem-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
   .gc-mobile-ecosystem-card {
-    min-height: 86px;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 212, 0, 0.22);
-    background: linear-gradient(
-      180deg,
-      rgba(17, 24, 39, 0.92),
-      rgba(8, 10, 18, 0.96)
-    );
-    color: #fff;
-    display: grid;
-    place-items: center;
-    gap: 6px;
-    cursor: pointer;
-  }
-
-  .gc-mobile-ecosystem-card span {
-    font-size: 26px;
+    min-height: 78px;
   }
 
   .gc-mobile-ecosystem-card strong {
-    font-size: 14px;
-    font-family: Orbitron, sans-serif;
-    font-weight: 900;
-    text-align: center;
-  }
-
-  .gc-mobile-ecosystem-card.selected {
-    background: #ffd400;
-    color: #050505;
-    border-color: #ffd400;
-  }
-
-  .gc-hero-area {
-    margin-top: 18px;
+    font-size: 12px;
   }
 }
