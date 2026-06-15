@@ -725,3 +725,68 @@ input {
     flex-basis: 100%;
   }
 }
+.gc-mobile-ecosystems {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .gc-sidebar {
+    display: none !important;
+  }
+
+  .gc-mobile-ecosystems {
+    display: block;
+  }
+
+  .gc-mobile-section-label {
+    margin-bottom: 12px;
+    color: #ffd400;
+    font-family: Orbitron, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .gc-mobile-ecosystem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .gc-mobile-ecosystem-card {
+    min-height: 86px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 212, 0, 0.22);
+    background: linear-gradient(
+      180deg,
+      rgba(17, 24, 39, 0.92),
+      rgba(8, 10, 18, 0.96)
+    );
+    color: #fff;
+    display: grid;
+    place-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .gc-mobile-ecosystem-card span {
+    font-size: 26px;
+  }
+
+  .gc-mobile-ecosystem-card strong {
+    font-size: 14px;
+    font-family: Orbitron, sans-serif;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .gc-mobile-ecosystem-card.selected {
+    background: #ffd400;
+    color: #050505;
+    border-color: #ffd400;
+  }
+
+  .gc-hero-area {
+    margin-top: 18px;
+  }
+}

@@ -32,6 +32,12 @@ type AdItem = {
 
 const categories = [
   "TÜMÜ",
+  "SİSTEMLER",
+  "OYUN DÜNYASI",
+  "EKİPMANLAR",
+  "YAŞAM ALANI",
+  "DİJİTAL VARLIKLAR",
+  "OYUN MARKETİ",
   "DONANIMLAR",
   "PC KASA",
   "FARE",
@@ -44,11 +50,23 @@ const categories = [
   "VALORANT VP",
 ];
 
+const ecosystems = [
+  { icon: "🖥️", title: "Sistemler", value: "SİSTEMLER" },
+  { icon: "🎮", title: "Oyun Dünyası", value: "OYUN DÜNYASI" },
+  { icon: "⌨️", title: "Ekipmanlar", value: "EKİPMANLAR" },
+  { icon: "🪑", title: "Yaşam Alanı", value: "YAŞAM ALANI" },
+  { icon: "💎", title: "Dijital Varlıklar", value: "DİJİTAL VARLIKLAR" },
+  { icon: "🏪", title: "Oyun Marketi", value: "OYUN MARKETİ" },
+];
+
 function withTimeout<T>(promise: Promise<T>, ms = 12000): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error("Firebase sorgusu zaman aşımına uğradı.")), ms)
+      setTimeout(
+        () => reject(new Error("Firebase sorgusu zaman aşımına uğradı.")),
+        ms
+      )
     ),
   ]);
 }
@@ -168,7 +186,7 @@ function HomePageContent() {
               ANA SAYFA
             </Link>
 
-            <small>KATEGORİLER</small>
+            <small>EKOSİSTEMLER</small>
 
             {categories.map((category) => (
               <button
@@ -188,6 +206,28 @@ function HomePageContent() {
         </aside>
 
         <section className="gc-content">
+          <section className="gc-mobile-ecosystems">
+            <div className="gc-mobile-section-label">EKOSİSTEMLER</div>
+
+            <div className="gc-mobile-ecosystem-grid">
+              {ecosystems.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => setSelectedCategory(item.value)}
+                  className={
+                    selectedCategory === item.value
+                      ? "gc-mobile-ecosystem-card selected"
+                      : "gc-mobile-ecosystem-card"
+                  }
+                >
+                  <span>{item.icon}</span>
+                  <strong>{item.title}</strong>
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="gc-hero-area">
             <Link href={premiumAd?.link || "/ad-request"} className="gc-hero">
               <div className="gc-hero-overlay">
