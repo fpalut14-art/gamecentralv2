@@ -529,9 +529,13 @@ input {
     font-size: 12px;
   }
 }
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .gc-mobile-ecosystems {
     display: block !important;
     outline: 5px solid lime !important;
+  }
+
+  .gc-sidebar {
+    display: none !important;
   }
 }
