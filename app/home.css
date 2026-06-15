@@ -357,7 +357,6 @@ input {
   color: #64748b;
 }
 
-/* Tablet */
 @media (max-width: 1200px) {
   .gc-layout,
   .gc-hero-area {
@@ -369,8 +368,11 @@ input {
   }
 }
 
-/* Mobile */
 @media (max-width: 900px) {
+  .gc-page {
+    padding-bottom: 90px;
+  }
+
   .gc-layout {
     width: calc(100% - 24px);
     margin: 18px auto;
@@ -408,8 +410,8 @@ input {
   .gc-mobile-ecosystem-card {
     min-height: 86px;
     border-radius: 18px;
-    border: 1px solid rgba(255, 212, 0, 0.22);
-    background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(8, 10, 18, 0.96));
+    border: 1px solid rgba(255, 212, 0, .22);
+    background: linear-gradient(180deg, rgba(17, 24, 39, .92), rgba(8, 10, 18, .96));
     color: #fff;
     display: grid;
     place-items: center;
@@ -507,7 +509,6 @@ input {
   }
 }
 
-/* Small phones */
 @media (max-width: 390px) {
   .gc-hero {
     height: 310px;
@@ -527,24 +528,5 @@ input {
 
   .gc-mobile-ecosystem-card strong {
     font-size: 12px;
-  }
-}
-@media (max-width: 1200px) {
-  .gc-mobile-ecosystems {
-    display: block !important;
-    outline: 5px solid lime !important;
-  }
-
-  .gc-sidebar {
-    display: none !important;
-  }
-}
-@media (max-width: 1400px) {
-  .gc-sidebar {
-    display: none !important;
-  }
-
-  .gc-mobile-ecosystems {
-    display: block !important;
   }
 }

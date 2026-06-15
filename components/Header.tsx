@@ -15,6 +15,7 @@ import {
 import { auth, db } from "@/lib/firebase";
 import DesktopHeader from "./DesktopHeader";
 import MobileHeader from "./MobileHeader";
+import MobileBottomActions from "./MobileBottomActions";
 import "./Header.css";
 
 export type UserProfile = {
@@ -44,10 +45,15 @@ export default function Header() {
   const [openNotifications, setOpenNotifications] = useState(false);
 
   const isAdminArea = pathname?.startsWith("/admin");
+  const isAuthPage = pathname === "/login" || pathname === "/register";
 
   async function loadNotifications(uid: string) {
     try {
-      const q = query(collection(db, "notifications"), where("userId", "==", uid));
+      const q = query(
+        collection(db, "notifications"),
+        where("userId", "==", uid)
+      );
+
       const snap = await getDocs(q);
 
       const data = snap.docs
@@ -76,18 +82,27 @@ export default function Header() {
         return;
       }
 
-      const snap = await getDoc(doc(db, "users", currentUser.uid));
+      try {
+        const snap = await getDoc(doc(db, "users", currentUser.uid));
 
-      if (snap.exists()) {
-        setProfile(snap.data() as UserProfile);
-      } else {
+        if (snap.exists()) {
+          setProfile(snap.data() as UserProfile);
+        } else {
+          setProfile({
+            email: currentUser.email || "",
+            role: "user",
+          });
+        }
+
+        await loadNotifications(currentUser.uid);
+      } catch (error) {
+        console.error("Header kullanıcı bilgisi alınamadı:", error);
+
         setProfile({
           email: currentUser.email || "",
           role: "user",
         });
       }
-
-      await loadNotifications(currentUser.uid);
     });
 
     return () => unsub();
@@ -150,7 +165,7 @@ export default function Header() {
     }
   }
 
-  if (isAdminArea) return null;
+  if (isAdminArea || isAuthPage) return null;
 
   const sharedProps = {
     user,
@@ -170,6 +185,11 @@ export default function Header() {
     <>
       <DesktopHeader {...sharedProps} />
       <MobileHeader {...sharedProps} />
+
+      <MobileBottomActions
+        isLoggedIn={!!user}
+        role={profile?.role}
+      />
     </>
   );
 }

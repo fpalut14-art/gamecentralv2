@@ -1,3 +1,8 @@
+/* ================================
+   GAMECENTRAL HEADER CSS
+   Desktop + Mobile + Bottom Nav
+================================ */
+
 .gc-desktop-header {
   min-height: 72px;
   padding: 0 28px;
@@ -26,10 +31,13 @@
   color: white;
   font-family: Orbitron, sans-serif;
   font-weight: 900;
-  font-size: 26px;
   letter-spacing: 1px;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.gc-header-logo {
+  font-size: 26px;
 }
 
 .gc-header-logo span,
@@ -80,6 +88,12 @@
   cursor: pointer;
 }
 
+.gc-header-link:hover,
+.gc-logout-link:hover {
+  border-color: rgba(255, 212, 0, 0.25);
+  color: #ffd400;
+}
+
 .gc-profile-link {
   color: #ffd400;
   border-color: rgba(255, 212, 0, 0.25);
@@ -94,6 +108,11 @@
   background: #ffd400;
 }
 
+.gc-seller-link:hover,
+.gc-register-link:hover {
+  color: #05060f;
+}
+
 .gc-admin-link {
   color: #38bdf8;
   border-color: rgba(56, 189, 248, 0.3);
@@ -105,7 +124,9 @@
   background: rgba(239, 68, 68, 0.08);
 }
 
-/* Notification */
+/* ================================
+   Notification
+================================ */
 
 .gc-notification-wrap {
   position: relative;
@@ -217,9 +238,15 @@
   margin-top: 10px;
 }
 
-/* Mobile Base */
+/* ================================
+   Mobile Header Base
+================================ */
 
 .gc-mobile-header {
+  display: none;
+}
+
+.gc-mobile-bottom-nav {
   display: none;
 }
 
@@ -263,6 +290,11 @@
     gap: 8px;
   }
 
+  .gc-mobile-icon-btn {
+    display: grid;
+    place-items: center;
+  }
+
   .gc-mobile-avatar,
   .gc-mobile-login-pill {
     width: 40px;
@@ -301,7 +333,9 @@
     font-weight: 800;
   }
 
-  .gc-mobile-action-row {
+  /* Eski mobil aksiyon sınıfları destekli kalır */
+  .gc-mobile-action-row,
+  .gc-mobile-primary-actions {
     margin-top: 12px;
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -348,15 +382,7 @@
     border-color: rgba(239, 68, 68, 0.35);
   }
 
-  .gc-mobile-primary-actions {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 8px;
-  }
-
-  /* Ecosystem Strip */
-
+  /* Ekosistem strip */
   .gc-mobile-ecosystem-strip {
     margin-top: 14px;
     padding: 12px;
@@ -460,6 +486,42 @@
     width: auto;
     max-height: 70vh;
   }
+
+  /* Bottom Nav */
+  .gc-mobile-bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background:
+      linear-gradient(180deg, rgba(9, 11, 18, 0.92), rgba(5, 5, 5, 0.98));
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 99999;
+  }
+
+  .gc-mobile-bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .gc-mobile-bottom-nav a span {
+    font-size: 11px;
+  }
+
+  .gc-mobile-bottom-nav a:hover {
+    color: #ffd400;
+  }
 }
 
 @media (max-width: 390px) {
@@ -467,10 +529,7 @@
     font-size: 20px;
   }
 
-  .gc-mobile-action-row {
-    grid-template-columns: 1fr;
-  }
-
+  .gc-mobile-action-row,
   .gc-mobile-primary-actions {
     grid-template-columns: 1fr;
   }
