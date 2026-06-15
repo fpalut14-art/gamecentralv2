@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ListingModal from "@/components/ListingModal";
 import "./home.css";
@@ -44,6 +44,15 @@ const categories = [
   "VALORANT VP",
 ];
 
+function withTimeout<T>(promise: Promise<T>, ms = 12000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("Firebase sorgusu zaman aşımına uğradı.")), ms)
+    ),
+  ]);
+}
+
 export default function HomePage() {
   return (
     <Suspense fallback={<main className="gc-page">Yükleniyor...</main>}>
@@ -61,6 +70,7 @@ function HomePageContent() {
   const [selectedCategory, setSelectedCategory] = useState("TÜMÜ");
   const [search, setSearch] = useState(urlQuery);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -68,37 +78,44 @@ function HomePageContent() {
   async function loadHomeData() {
     try {
       setLoading(true);
+      setErrorMessage("");
 
       const productQuery = query(
         collection(db, "products"),
-        where("status", "==", "active")
+        where("status", "==", "active"),
+        limit(24)
       );
 
       const adsQuery = query(
         collection(db, "ads"),
-        where("status", "==", "active")
+        where("status", "==", "active"),
+        limit(24)
       );
 
-      const [productSnap, adsSnap] = await Promise.all([
-        getDocs(productQuery),
-        getDocs(adsQuery),
-      ]);
-
-      setProducts(
-        productSnap.docs.map((item) => ({
-          id: item.id,
-          ...(item.data() as Omit<Product, "id">),
-        }))
+      const [productSnap, adsSnap] = await withTimeout(
+        Promise.all([getDocs(productQuery), getDocs(adsQuery)]),
+        12000
       );
 
-      setAds(
-        adsSnap.docs.map((item) => ({
-          id: item.id,
-          ...(item.data() as Omit<AdItem, "id">),
-        }))
-      );
+      const productData = productSnap.docs.map((item) => ({
+        id: item.id,
+        ...(item.data() as Omit<Product, "id">),
+      }));
+
+      const adsData = adsSnap.docs.map((item) => ({
+        id: item.id,
+        ...(item.data() as Omit<AdItem, "id">),
+      }));
+
+      setProducts(productData);
+      setAds(adsData);
     } catch (error) {
       console.error("Ana sayfa veri çekme hatası:", error);
+      setProducts([]);
+      setAds([]);
+      setErrorMessage(
+        "İlanlar yüklenemedi. Firebase bağlantısı, Firestore izinleri veya mobil bağlantı kontrol edilmeli."
+      );
     } finally {
       setLoading(false);
     }
@@ -156,6 +173,7 @@ function HomePageContent() {
             {categories.map((category) => (
               <button
                 key={category}
+                type="button"
                 onClick={() => setSelectedCategory(category)}
                 className={
                   selectedCategory === category
@@ -231,62 +249,66 @@ function HomePageContent() {
                 )}
               </div>
 
-              <button onClick={loadHomeData} className="gc-refresh">
+              <button type="button" onClick={loadHomeData} className="gc-refresh">
                 ↻ YENİLE
               </button>
             </div>
 
             {loading && <div className="gc-empty">İlanlar yükleniyor...</div>}
 
-            {!loading && filteredProducts.length === 0 && (
+            {!loading && errorMessage && (
+              <div className="gc-empty">{errorMessage}</div>
+            )}
+
+            {!loading && !errorMessage && filteredProducts.length === 0 && (
               <div className="gc-empty">Aktif ilan bulunamadı.</div>
             )}
 
-            <div className="gc-product-grid">
-              {filteredProducts.map((product) => {
-                const productImage = product.imageUrl || product.imageBase64 || "";
+            {!loading && !errorMessage && filteredProducts.length > 0 && (
+              <div className="gc-product-grid">
+                {filteredProducts.map((product) => {
+                  const productImage =
+                    product.imageUrl || product.imageBase64 || "";
 
-                return (
-                  <article className="gc-card" key={product.id}>
-                    <div className="gc-card-image">
-                      {productImage ? (
-                        <img
-                          src={productImage}
-                          alt={product.title || "İlan"}
-                        />
-                      ) : (
-                        <span>GAMECENTRAL</span>
-                      )}
-                    </div>
+                  return (
+                    <article className="gc-card" key={product.id}>
+                      <div className="gc-card-image">
+                        {productImage ? (
+                          <img src={productImage} alt={product.title || "İlan"} />
+                        ) : (
+                          <span>GAMECENTRAL</span>
+                        )}
+                      </div>
 
-                    <div className="gc-card-body">
-                      <span className="gc-card-category">
-                        {product.category || "Kategori Yok"}
-                      </span>
+                      <div className="gc-card-body">
+                        <span className="gc-card-category">
+                          {product.category || "Kategori Yok"}
+                        </span>
 
-                      <h3>{product.title || "Başlıksız İlan"}</h3>
+                        <h3>{product.title || "Başlıksız İlan"}</h3>
 
-                      <p className="gc-seller">
-                        Satıcı: {product.seller || "Doğrulanmamış Satıcı"}
-                      </p>
+                        <p className="gc-seller">
+                          Satıcı: {product.seller || "Doğrulanmamış Satıcı"}
+                        </p>
 
-                      <div className="gc-price">₺{product.price || 0}</div>
+                        <div className="gc-price">₺{product.price || 0}</div>
 
-                      <button
-                        type="button"
-                        className="gc-card-btn"
-                        onClick={() => {
-                          setSelectedProduct(product);
-                          setModalOpen(true);
-                        }}
-                      >
-                        İNCELE
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                        <button
+                          type="button"
+                          className="gc-card-btn"
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setModalOpen(true);
+                          }}
+                        >
+                          İNCELE
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
           <section className="gc-partners">
