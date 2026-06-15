@@ -310,3 +310,71 @@
     max-height: 70vh;
   }
 }
+@media (max-width: 900px) {
+  .gc-mobile-primary-actions {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .gc-mobile-create,
+  .gc-mobile-login,
+  .gc-mobile-register,
+  .gc-mobile-profile,
+  .gc-mobile-logout {
+    min-height: 42px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gc-mobile-create,
+  .gc-mobile-register {
+    background: #ffd400;
+    color: #05060f;
+  }
+
+  .gc-mobile-login,
+  .gc-mobile-profile {
+    background: rgba(255, 255, 255, 0.04);
+    color: #cbd5e1;
+  }
+
+  .gc-mobile-logout {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+
+  .gc-mobile-shortcuts {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .gc-mobile-shortcuts::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gc-mobile-shortcuts a {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 12px;
+  }
+}
