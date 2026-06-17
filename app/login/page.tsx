@@ -42,25 +42,35 @@ export default function LoginPage() {
         password
       );
 
-      const uid = result.user.uid;
-      const userRef = doc(db, "users", uid);
-      const userSnap = await getDoc(userRef);
+      const userRef = doc(db, "users", result.user.uid);
+      let userData: AppUser = {
+        email: result.user.email || cleanEmail,
+        role: "user",
+        sellerStatus: "none",
+        banned: false,
+      };
 
-      let userData: AppUser;
+      try {
+        const userSnap = await getDoc(userRef);
 
-      if (userSnap.exists()) {
-        userData = userSnap.data() as AppUser;
-      } else {
-        userData = {
-          email: result.user.email || cleanEmail,
-          role: "user",
-          sellerStatus: "none",
-          banned: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        await setDoc(userRef, userData, { merge: true });
+        if (userSnap.exists()) {
+          userData = {
+            ...userData,
+            ...(userSnap.data() as AppUser),
+          };
+        } else {
+          await setDoc(
+            userRef,
+            {
+              ...userData,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+            { merge: true }
+          );
+        }
+      } catch (profileError) {
+        console.error("USER PROFILE READ ERROR:", profileError);
       }
 
       if (userData.banned === true) {
@@ -68,15 +78,19 @@ export default function LoginPage() {
         return;
       }
 
-      await setDoc(
-        userRef,
-        {
-          email: result.user.email || cleanEmail,
-          lastLoginAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      );
+      try {
+        await setDoc(
+          userRef,
+          {
+            email: result.user.email || cleanEmail,
+            lastLoginAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      } catch (profileUpdateError) {
+        console.error("USER PROFILE UPDATE ERROR:", profileUpdateError);
+      }
 
       if (userData.role === "admin") {
         router.push("/admin");
@@ -104,16 +118,6 @@ export default function LoginPage() {
 
       if (error?.code === "auth/wrong-password") {
         setErrorMessage("Şifre hatalı.");
-        return;
-      }
-
-      if (
-        error?.code === "permission-denied" ||
-        error?.code === "firestore/permission-denied"
-      ) {
-        setErrorMessage(
-          "Giriş başarılı fakat kullanıcı profili okunamadı. Firestore Rules users iznini kontrol et."
-        );
         return;
       }
 

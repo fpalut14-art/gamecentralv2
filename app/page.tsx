@@ -59,6 +59,14 @@ const ecosystems = [
   { icon: "🏪", title: "Oyun Marketi", value: "OYUN MARKETİ" },
 ];
 
+const ALL_CATEGORY = "TÜMÜ";
+
+function normalizeText(value?: string) {
+  return String(value || "")
+    .trim()
+    .toLocaleLowerCase("tr-TR");
+}
+
 function withTimeout<T>(promise: Promise<T>, ms = 12000): Promise<T> {
   return Promise.race([
     promise,
@@ -85,7 +93,7 @@ function HomePageContent() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [ads, setAds] = useState<AdItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("TÜMÜ");
+  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORY);
   const [search, setSearch] = useState(urlQuery);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -149,15 +157,15 @@ function HomePageContent() {
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const q = search.toLowerCase().trim();
+      const q = normalizeText(search);
 
-      const productCategory = String(product.category || "").toLowerCase();
-      const productTitle = String(product.title || "").toLowerCase();
-      const productSeller = String(product.seller || "").toLowerCase();
+      const productCategory = normalizeText(product.category);
+      const productTitle = normalizeText(product.title);
+      const productSeller = normalizeText(product.seller);
 
       const categoryMatch =
-        selectedCategory === "TÜMÜ" ||
-        productCategory === selectedCategory.toLowerCase();
+        selectedCategory === ALL_CATEGORY ||
+        productCategory === normalizeText(selectedCategory);
 
       const searchMatch =
         q === "" ||
@@ -207,17 +215,6 @@ function HomePageContent() {
 
         <section className="gc-content">
           <section className="gc-mobile-ecosystems">
-            <div
-  style={{
-    background: "red",
-    color: "white",
-    padding: "20px",
-    fontSize: "30px",
-    fontWeight: "bold",
-  }}
->
-  MOBİL TEST KUTUSU
-</div>
             <div className="gc-mobile-section-label">EKOSİSTEMLER</div>
 
             <div className="gc-mobile-ecosystem-grid">
