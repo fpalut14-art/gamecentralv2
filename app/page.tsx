@@ -21,6 +21,26 @@ type Product = {
   description?: string;
 };
 
+type ProductDocument = Omit<Product, "id"> & {
+  başlık?: string;
+  baslik?: string;
+  fiyat?: number | string;
+  kategori?: string;
+  durum?: string;
+  satıcı?: string;
+  satici?: string;
+  satıcıKimliği?: string;
+  "satıcı kimliği"?: string;
+  saticiKimligi?: string;
+  "satici kimligi"?: string;
+  gorselUrl?: string;
+  görselUrl?: string;
+  gorselBase64?: string;
+  görselBase64?: string;
+  açıklama?: string;
+  aciklama?: string;
+};
+
 type AdItem = {
   id: string;
   brand?: string;
@@ -28,6 +48,7 @@ type AdItem = {
   slot?: "premium" | "right-banner" | "partner-slot";
   link?: string;
   status?: string;
+  durum?: string;
 };
 
 const categories = [
@@ -65,6 +86,45 @@ function normalizeText(value?: string) {
   return String(value || "")
     .trim()
     .toLocaleLowerCase("tr-TR");
+}
+
+function toPrice(value: unknown) {
+  if (typeof value === "number") return value;
+  if (typeof value !== "string") return 0;
+
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isActiveStatus(value?: string) {
+  const status = normalizeText(value);
+  return status === "active" || status === "aktif";
+}
+
+function mapProduct(id: string, data: ProductDocument): Product {
+  return {
+    id,
+    title: data.title || data.başlık || data.baslik || "",
+    price: toPrice(data.price ?? data.fiyat),
+    category: data.category || data.kategori || "",
+    status: data.status || data.durum || "",
+    seller: data.seller || data.satıcı || data.satici || "",
+    sellerId:
+      data.sellerId ||
+      data.satıcıKimliği ||
+      data["satıcı kimliği"] ||
+      data.saticiKimligi ||
+      data["satici kimligi"] ||
+      "",
+    imageUrl: data.imageUrl || data.görselUrl || data.gorselUrl || "",
+    imageBase64:
+      data.imageBase64 || data.görselBase64 || data.gorselBase64 || "",
+    description: data.description || data.açıklama || data.aciklama || "",
+  };
+}
+
+function uniqueProducts(items: Product[]) {
+  return Array.from(new Map(items.map((item) => [item.id, item])).values());
 }
 
 function withTimeout<T>(promise: Promise<T>, ms = 12000): Promise<T> {
@@ -106,9 +166,15 @@ function HomePageContent() {
       setLoading(true);
       setErrorMessage("");
 
-      const productQuery = query(
+      const activeStatusQuery = query(
         collection(db, "products"),
         where("status", "==", "active"),
+        limit(24)
+      );
+
+      const activeDurumQuery = query(
+        collection(db, "products"),
+        where("durum", "==", "aktif"),
         limit(24)
       );
 
@@ -118,20 +184,38 @@ function HomePageContent() {
         limit(24)
       );
 
-      const [productSnap, adsSnap] = await withTimeout(
-        Promise.all([getDocs(productQuery), getDocs(adsQuery)]),
+      const [statusResult, durumResult, adsSnap] = await withTimeout(
+        Promise.allSettled([
+          getDocs(activeStatusQuery),
+          getDocs(activeDurumQuery),
+          getDocs(adsQuery),
+        ]),
         12000
       );
 
-      const productData = productSnap.docs.map((item) => ({
-        id: item.id,
-        ...(item.data() as Omit<Product, "id">),
-      }));
+      const productData = uniqueProducts(
+        [statusResult, durumResult].flatMap((result) =>
+          result.status === "fulfilled"
+            ? result.value.docs.map((item) =>
+                mapProduct(item.id, item.data() as ProductDocument)
+              )
+            : []
+        )
+      ).filter((product) => isActiveStatus(product.status));
 
-      const adsData = adsSnap.docs.map((item) => ({
-        id: item.id,
-        ...(item.data() as Omit<AdItem, "id">),
-      }));
+      const adsData =
+        adsSnap.status === "fulfilled"
+          ? adsSnap.value.docs
+              .map((item) => ({
+                id: item.id,
+                ...(item.data() as Omit<AdItem, "id">),
+              }))
+              .filter((ad) => isActiveStatus(ad.status || ad.durum))
+          : [];
+
+      if (statusResult.status === "rejected" && durumResult.status === "rejected") {
+        throw statusResult.reason || durumResult.reason;
+      }
 
       setProducts(productData);
       setAds(adsData);

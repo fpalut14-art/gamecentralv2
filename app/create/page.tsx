@@ -153,7 +153,7 @@ export default function CreatePage() {
       router.push("/");
     } catch (error) {
       console.error("İlan oluşturma hatası:", error);
-      alert("İlan oluşturulamadı. Console hatasına bak.");
+      alert("İlan oluşturulamadı. Lütfen tekrar dene.");
     } finally {
       setSubmitting(false);
     }

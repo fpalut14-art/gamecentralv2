@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { User } from "firebase/auth";
 import NotificationPanel from "./NotificationPanel";
-import { NotificationItem, UserProfile } from "./Header";
+import type { NotificationItem, UserProfile } from "./Header";
 
 type Props = {
   user: User | null;

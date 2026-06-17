@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 
 export default function FloatingSupport() {
   const pathname = usePathname();
+  const isAuthPage = pathname === "/login" || pathname === "/register";
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || isAuthPage) return null;
 
   return (
     <Link href="/support" style={button}>
@@ -24,7 +25,7 @@ const button: React.CSSProperties = {
   position: "fixed",
   right: 24,
   bottom: 24,
-  zIndex: 1000,
+  zIndex: 900,
   minWidth: 190,
   height: 64,
   borderRadius: 999,
@@ -37,6 +38,7 @@ const button: React.CSSProperties = {
   textDecoration: "none",
   fontWeight: 900,
   boxShadow: "0 18px 50px rgba(255,212,0,0.28)",
+  pointerEvents: "auto",
 };
 
 const icon: React.CSSProperties = {

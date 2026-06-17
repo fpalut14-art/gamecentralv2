@@ -159,7 +159,6 @@ export default function ListingDetailPage() {
       alert(
         "Bu ilanda sellerId eksik. Firestore products kaydına sellerId eklenmeli."
       );
-      console.log("SELLER ID EKSİK PRODUCT:", product);
       return false;
     }
 
@@ -176,13 +175,6 @@ export default function ListingDetailPage() {
   }
 
   async function startChatOnly() {
-    console.log("START CHAT TIKLANDI", {
-      currentUser: currentUser?.uid,
-      productId: id,
-      sellerId: product?.sellerId,
-      product,
-    });
-
     if (!validateAction("chat")) return;
 
     try {
@@ -211,7 +203,7 @@ export default function ListingDetailPage() {
       router.push(`/chat/${chatId}`);
     } catch (error) {
       console.error("Sohbet başlatma hatası:", error);
-      alert("Sohbet başlatılamadı. Console hatasına bak.");
+      alert("Sohbet başlatılamadı. Lütfen tekrar dene.");
     } finally {
       setChatting(false);
     }

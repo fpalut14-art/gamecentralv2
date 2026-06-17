@@ -5,7 +5,7 @@ export const env = {
   firebaseStorageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
   firebaseMessagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
   firebaseAppId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://gamecentral.vercel.app',
 };
 
 export function checkPublicEnv() {

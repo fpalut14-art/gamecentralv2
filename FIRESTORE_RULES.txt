@@ -8,6 +8,8 @@ service cloud.firestore {
     function isAdmin() { return hasUser() && userData().role == "admin" && userData().banned != true; }
     function isSeller() { return hasUser() && (userData().role == "seller" || userData().role == "admin") && userData().banned != true; }
     function isNotBanned() { return signedIn() && (!hasUser() || !("banned" in userData()) || userData().banned != true); }
+    function activeProduct(data) { return data.status == "active" || data.durum == "aktif"; }
+    function productOwner(data) { return signedIn() && (request.auth.uid == data.sellerId || request.auth.uid == data.saticiKimligi || request.auth.uid == data["satıcıKimliği"]); }
 
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
@@ -17,8 +19,8 @@ service cloud.firestore {
     }
 
     match /products/{productId} {
-      allow read: if resource.data.status == "active" || isAdmin() || (signedIn() && request.auth.uid == resource.data.sellerId);
-      allow create: if isSeller() && isNotBanned() && request.resource.data.status == "pending" && request.resource.data.sellerId == request.auth.uid;
+      allow read: if activeProduct(resource.data) || isAdmin() || productOwner(resource.data);
+      allow create: if isSeller() && isNotBanned() && (request.resource.data.status == "pending" || request.resource.data.durum == "beklemede") && (request.resource.data.sellerId == request.auth.uid || request.resource.data.saticiKimligi == request.auth.uid || request.resource.data["satıcıKimliği"] == request.auth.uid);
       allow update, delete: if isAdmin();
     }
 

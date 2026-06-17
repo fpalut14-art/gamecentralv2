@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { User } from "firebase/auth";
 import NotificationPanel from "./NotificationPanel";
-import { NotificationItem, UserProfile } from "./Header";
+import type { NotificationItem, UserProfile } from "./Header";
 
 type Props = {
   user: User | null;
@@ -21,12 +21,12 @@ type Props = {
 };
 
 const ecosystems = [
-  { icon: "🖥️", title: "Sistemler", href: "/?q=Sistemler" },
-  { icon: "🎮", title: "Oyun Dünyası", href: "/?q=Oyun" },
-  { icon: "⌨️", title: "Ekipmanlar", href: "/?q=Ekipman" },
-  { icon: "🪑", title: "Yaşam Alanı", href: "/?q=Koltuk" },
-  { icon: "💎", title: "Dijital", href: "/?q=Valorant" },
-  { icon: "🏪", title: "Oyun Marketi", href: "/?q=Market" },
+  { icon: "🖥️", title: "Sistemler", href: "/?q=SİSTEMLER" },
+  { icon: "🎮", title: "Oyun Dünyası", href: "/?q=OYUN DÜNYASI" },
+  { icon: "⌨️", title: "Ekipmanlar", href: "/?q=EKİPMANLAR" },
+  { icon: "🪑", title: "Yaşam Alanı", href: "/?q=YAŞAM ALANI" },
+  { icon: "💎", title: "Dijital", href: "/?q=DİJİTAL VARLIKLAR" },
+  { icon: "🏪", title: "Oyun Marketi", href: "/?q=OYUN MARKETİ" },
 ];
 
 export default function MobileHeader({

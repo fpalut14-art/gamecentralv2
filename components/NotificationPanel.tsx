@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { NotificationItem } from "./Header";
+import type { NotificationItem } from "./Header";
 
 type Props = {
   notifications: NotificationItem[];
