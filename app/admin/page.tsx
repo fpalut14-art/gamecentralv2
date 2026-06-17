@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { money } from '@/lib/format';
+import React, { useEffect, useState } from "react";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { money } from "@/lib/format";
 
 type Stats = {
   users: number;
@@ -17,53 +17,113 @@ type Stats = {
   betaVolume: number;
 };
 
+type LoadErrors = Record<string, string>;
+
+const emptyStats: Stats = {
+  users: 0,
+  activeProducts: 0,
+  pendingProducts: 0,
+  orders: 0,
+  support: 0,
+  reports: 0,
+  sellerRequests: 0,
+  ads: 0,
+  betaVolume: 0,
+};
+
+function normalize(value: unknown) {
+  return String(value || "").toLocaleLowerCase("tr-TR").trim();
+}
+
+function isActiveProduct(product: any) {
+  const status = normalize(product.status || product["durum"]);
+  return status === "active" || status === "aktif";
+}
+
+function isPendingProduct(product: any) {
+  const status = normalize(product.status || product["durum"]);
+  return status === "pending" || status === "beklemede";
+}
+
+function getOrderAmount(order: any) {
+  return Number(order.amount ?? order["tutar"] ?? 0);
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({
-    users: 0,
-    activeProducts: 0,
-    pendingProducts: 0,
-    orders: 0,
-    support: 0,
-    reports: 0,
-    sellerRequests: 0,
-    ads: 0,
-    betaVolume: 0,
-  });
+  const [stats, setStats] = useState<Stats>(emptyStats);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<LoadErrors>({});
+
+  async function safeGet(label: string, getter: () => Promise<any>) {
+    try {
+      return await getter();
+    } catch (error: any) {
+      console.error(`${label} verisi çekilemedi:`, error);
+
+      setErrors((prev) => ({
+        ...prev,
+        [label]: error?.code || error?.message || "Bilinmeyen hata",
+      }));
+
+      return null;
+    }
+  }
 
   async function load() {
-    try {
-      setLoading(true);
-      const [users, products, orders, ads, reports, support, sellerRequests] = await Promise.all([
-        getDocs(collection(db, 'users')),
-        getDocs(collection(db, 'products')),
-        getDocs(collection(db, 'orders')),
-        getDocs(collection(db, 'ads')),
-        getDocs(query(collection(db, 'reports'), where('status', '==', 'pending'))),
-        getDocs(query(collection(db, 'support_tickets'), where('status', '==', 'open'))),
-        getDocs(query(collection(db, 'users'), where('sellerStatus', '==', 'pending'))),
-      ]);
+    setLoading(true);
+    setErrors({});
 
-      const productData = products.docs.map((d) => d.data());
-      const orderData = orders.docs.map((d) => d.data());
+    const usersSnap = await safeGet("users", () =>
+      getDocs(collection(db, "users"))
+    );
 
-      setStats({
-        users: users.size,
-        activeProducts: productData.filter((p) => p.status === 'active').length,
-        pendingProducts: productData.filter((p) => p.status === 'pending').length,
-        orders: orders.size,
-        ads: ads.size,
-        reports: reports.size,
-        support: support.size,
-        sellerRequests: sellerRequests.size,
-        betaVolume: orderData.reduce((sum, order) => sum + Number(order.amount || 0), 0),
-      });
-    } catch (error) {
-      console.error('Dashboard verileri çekilemedi:', error);
-      alert('Dashboard verileri çekilemedi.');
-    } finally {
-      setLoading(false);
-    }
+    const productsSnap = await safeGet("products", () =>
+      getDocs(collection(db, "products"))
+    );
+
+    const ordersSnap = await safeGet("orders", () =>
+      getDocs(collection(db, "orders"))
+    );
+
+    const adsSnap = await safeGet("ads", () =>
+      getDocs(collection(db, "ads"))
+    );
+
+    const reportsSnap = await safeGet("reports", () =>
+      getDocs(query(collection(db, "reports"), where("status", "==", "pending")))
+    );
+
+    const supportSnap = await safeGet("support_tickets", () =>
+      getDocs(
+        query(collection(db, "support_tickets"), where("status", "==", "open"))
+      )
+    );
+
+    const sellerRequestsSnap = await safeGet("sellerRequests", () =>
+      getDocs(
+        query(collection(db, "users"), where("sellerStatus", "==", "pending"))
+      )
+    );
+
+    const productData = productsSnap?.docs.map((d: any) => d.data()) || [];
+    const orderData = ordersSnap?.docs.map((d: any) => d.data()) || [];
+
+    setStats({
+      users: usersSnap?.size || 0,
+      activeProducts: productData.filter(isActiveProduct).length,
+      pendingProducts: productData.filter(isPendingProduct).length,
+      orders: ordersSnap?.size || 0,
+      ads: adsSnap?.size || 0,
+      reports: reportsSnap?.size || 0,
+      support: supportSnap?.size || 0,
+      sellerRequests: sellerRequestsSnap?.size || 0,
+      betaVolume: orderData.reduce(
+        (sum: number, order: any) => sum + getOrderAmount(order),
+        0
+      ),
+    });
+
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -71,15 +131,15 @@ export default function AdminDashboard() {
   }, []);
 
   const cards = [
-    ['Toplam Kullanıcı', stats.users],
-    ['Aktif İlan', stats.activeProducts],
-    ['Bekleyen İlan', stats.pendingProducts],
-    ['Sipariş Talebi', stats.orders],
-    ['Açık Destek', stats.support],
-    ['Bekleyen Rapor', stats.reports],
-    ['Satıcı Başvurusu', stats.sellerRequests],
-    ['Reklam Başvurusu', stats.ads],
-    ['Beta İşlem Hacmi', money(stats.betaVolume)],
+    ["Toplam Kullanıcı", stats.users],
+    ["Aktif İlan", stats.activeProducts],
+    ["Bekleyen İlan", stats.pendingProducts],
+    ["Sipariş Talebi", stats.orders],
+    ["Açık Destek", stats.support],
+    ["Bekleyen Rapor", stats.reports],
+    ["Satıcı Başvurusu", stats.sellerRequests],
+    ["Reklam Başvurusu", stats.ads],
+    ["Beta İşlem Hacmi", money(stats.betaVolume)],
   ];
 
   return (
@@ -89,10 +149,25 @@ export default function AdminDashboard() {
           <h1 style={title}>Admin Dashboard</h1>
           <p style={muted}>GameCentral Faz 1 Beta sistem merkezi.</p>
         </div>
-        <button onClick={load} style={refresh}>Yenile</button>
+
+        <button type="button" onClick={load} style={refresh}>
+          Yenile
+        </button>
       </div>
 
       {loading && <p style={muted}>Veriler yükleniyor...</p>}
+
+      {Object.keys(errors).length > 0 && (
+        <div style={errorBox}>
+          <strong>Eksik yüklenen alanlar:</strong>
+
+          {Object.entries(errors).map(([key, value]) => (
+            <p key={key} style={{ margin: "8px 0 0" }}>
+              {key}: {value}
+            </p>
+          ))}
+        </div>
+      )}
 
       <div style={grid}>
         {cards.map(([label, value]) => (
@@ -106,10 +181,59 @@ export default function AdminDashboard() {
   );
 }
 
-const top: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 };
-const title: React.CSSProperties = { fontSize: 34, margin: 0, color: '#ffd400' };
-const muted: React.CSSProperties = { color: '#94a3b8' };
-const refresh: React.CSSProperties = { padding: '12px 18px', borderRadius: 12, border: '1px solid rgba(255,212,0,0.35)', background: 'rgba(255,212,0,0.09)', color: '#ffd400', fontWeight: 900, cursor: 'pointer' };
-const grid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18 };
-const card: React.CSSProperties = { padding: 22, borderRadius: 18, background: '#101827', border: '1px solid #263244', display: 'grid', gap: 10 };
-const number: React.CSSProperties = { color: '#ffd400', fontSize: 34 };
+const top: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 28,
+  gap: 16,
+};
+
+const title: React.CSSProperties = {
+  fontSize: 34,
+  margin: 0,
+  color: "#ffd400",
+};
+
+const muted: React.CSSProperties = {
+  color: "#94a3b8",
+};
+
+const refresh: React.CSSProperties = {
+  padding: "12px 18px",
+  borderRadius: 12,
+  border: "1px solid rgba(255,212,0,0.35)",
+  background: "rgba(255,212,0,0.09)",
+  color: "#ffd400",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const grid: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 18,
+};
+
+const card: React.CSSProperties = {
+  padding: 22,
+  borderRadius: 18,
+  background: "#101827",
+  border: "1px solid #263244",
+  display: "grid",
+  gap: 10,
+};
+
+const number: React.CSSProperties = {
+  color: "#ffd400",
+  fontSize: 34,
+};
+
+const errorBox: React.CSSProperties = {
+  marginBottom: 18,
+  padding: 16,
+  borderRadius: 14,
+  background: "rgba(239,68,68,0.1)",
+  border: "1px solid rgba(239,68,68,0.3)",
+  color: "#fca5a5",
+};
