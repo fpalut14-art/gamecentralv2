@@ -29,11 +29,10 @@ export default function AdminUsers() {
 
       const snap = await getDocs(collection(db, "users"));
 
-      const data = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() } as AppUser))
-        .sort((a, b) =>
-          String(b.createdAt || "").localeCompare(String(a.createdAt || ""))
-        );
+      const data = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as AppUser[];
 
       setUsers(data);
     } catch (error) {
@@ -74,6 +73,10 @@ export default function AdminUsers() {
     }
   }
 
+  useEffect(() => {
+    load();
+  }, []);
+
   const s = getStyles(isMobile);
 
   return (
@@ -83,7 +86,7 @@ export default function AdminUsers() {
           <span style={s.eyebrow}>ADMIN USERS</span>
           <h1 style={s.title}>Kullanıcılar</h1>
           <p style={s.muted}>
-            Kullanıcı rollerini, satıcı yetkilerini ve ban durumlarını yönet.
+            Kullanıcı rolleri, satıcı yetkileri ve ban durumu.
           </p>
         </div>
 
@@ -109,7 +112,9 @@ export default function AdminUsers() {
               </div>
 
               <div style={{ minWidth: 0 }}>
-                <h3 style={s.userName}>{user.name || user.email || "İsimsiz"}</h3>
+                <h3 style={s.userName}>
+                  {user.name || user.email || "İsimsiz"}
+                </h3>
                 <p style={s.muted}>{user.email || "Email yok"}</p>
               </div>
             </div>
