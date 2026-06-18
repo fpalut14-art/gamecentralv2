@@ -53,6 +53,18 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>(emptyStats);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<LoadErrors>({});
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function checkMobile() {
+      setIsMobile(window.innerWidth <= 900);
+    }
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   async function safeGet(label: string, getter: () => Promise<any>) {
     try {
@@ -85,9 +97,7 @@ export default function AdminDashboard() {
       getDocs(collection(db, "orders"))
     );
 
-    const adsSnap = await safeGet("ads", () =>
-      getDocs(collection(db, "ads"))
-    );
+    const adsSnap = await safeGet("ads", () => getDocs(collection(db, "ads")));
 
     const reportsSnap = await safeGet("reports", () =>
       getDocs(query(collection(db, "reports"), where("status", "==", "pending")))
@@ -130,6 +140,8 @@ export default function AdminDashboard() {
     load();
   }, []);
 
+  const s = getStyles(isMobile);
+
   const cards = [
     ["Toplam Kullanıcı", stats.users],
     ["Aktif İlan", stats.activeProducts],
@@ -143,22 +155,21 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div>
-      <div style={top}>
+    <div style={s.page}>
+      <div style={s.top}>
         <div>
-          <h1 style={title}>Admin Dashboard</h1>
-          <p style={muted}>GameCentral Faz 1 Beta sistem merkezi.</p>
+          <span style={s.eyebrow}>GAMECENTRAL ADMIN</span>
+          <h1 style={s.title}>Admin Dashboard</h1>
+          <p style={s.muted}>GameCentral Faz 1 Beta sistem merkezi.</p>
         </div>
 
-        <button type="button" onClick={load} style={refresh}>
-          Yenile
+        <button type="button" onClick={load} style={s.refresh}>
+          {loading ? "Yükleniyor..." : "Yenile"}
         </button>
       </div>
 
-      {loading && <p style={muted}>Veriler yükleniyor...</p>}
-
       {Object.keys(errors).length > 0 && (
-        <div style={errorBox}>
+        <div style={s.errorBox}>
           <strong>Eksik yüklenen alanlar:</strong>
 
           {Object.entries(errors).map(([key, value]) => (
@@ -169,11 +180,11 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div style={grid}>
+      <div style={s.grid}>
         {cards.map(([label, value]) => (
-          <div key={String(label)} style={card}>
-            <span style={muted}>{label}</span>
-            <strong style={number}>{String(value)}</strong>
+          <div key={String(label)} style={s.card}>
+            <span style={s.muted}>{label}</span>
+            <strong style={s.number}>{String(value)}</strong>
           </div>
         ))}
       </div>
@@ -181,59 +192,94 @@ export default function AdminDashboard() {
   );
 }
 
-const top: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: 28,
-  gap: 16,
-};
+function getStyles(isMobile: boolean) {
+  const page: React.CSSProperties = {
+    width: "100%",
+  };
 
-const title: React.CSSProperties = {
-  fontSize: 34,
-  margin: 0,
-  color: "#ffd400",
-};
+  const top: React.CSSProperties = {
+    display: isMobile ? "grid" : "flex",
+    justifyContent: "space-between",
+    alignItems: isMobile ? "stretch" : "center",
+    marginBottom: 28,
+    gap: 16,
+  };
 
-const muted: React.CSSProperties = {
-  color: "#94a3b8",
-};
+  const eyebrow: React.CSSProperties = {
+    color: "#ffd400",
+    fontWeight: 900,
+    letterSpacing: 1,
+    fontSize: 12,
+  };
 
-const refresh: React.CSSProperties = {
-  padding: "12px 18px",
-  borderRadius: 12,
-  border: "1px solid rgba(255,212,0,0.35)",
-  background: "rgba(255,212,0,0.09)",
-  color: "#ffd400",
-  fontWeight: 900,
-  cursor: "pointer",
-};
+  const title: React.CSSProperties = {
+    fontSize: isMobile ? 30 : 34,
+    margin: "8px 0 0",
+    color: "#ffd400",
+    lineHeight: 1.05,
+  };
 
-const grid: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: 18,
-};
+  const muted: React.CSSProperties = {
+    color: "#94a3b8",
+    overflowWrap: "anywhere",
+  };
 
-const card: React.CSSProperties = {
-  padding: 22,
-  borderRadius: 18,
-  background: "#101827",
-  border: "1px solid #263244",
-  display: "grid",
-  gap: 10,
-};
+  const refresh: React.CSSProperties = {
+    width: isMobile ? "100%" : "auto",
+    minHeight: 46,
+    padding: "0 18px",
+    borderRadius: 12,
+    border: "1px solid rgba(255,212,0,0.35)",
+    background: "rgba(255,212,0,0.09)",
+    color: "#ffd400",
+    fontWeight: 900,
+    cursor: "pointer",
+  };
 
-const number: React.CSSProperties = {
-  color: "#ffd400",
-  fontSize: 34,
-};
+  const grid: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: isMobile
+      ? "repeat(2, minmax(0, 1fr))"
+      : "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: isMobile ? 12 : 18,
+  };
 
-const errorBox: React.CSSProperties = {
-  marginBottom: 18,
-  padding: 16,
-  borderRadius: 14,
-  background: "rgba(239,68,68,0.1)",
-  border: "1px solid rgba(239,68,68,0.3)",
-  color: "#fca5a5",
-};
+  const card: React.CSSProperties = {
+    padding: isMobile ? 16 : 22,
+    borderRadius: 18,
+    background: "#101827",
+    border: "1px solid #263244",
+    display: "grid",
+    gap: 10,
+    minWidth: 0,
+  };
+
+  const number: React.CSSProperties = {
+    color: "#ffd400",
+    fontSize: isMobile ? 24 : 34,
+    overflowWrap: "anywhere",
+  };
+
+  const errorBox: React.CSSProperties = {
+    marginBottom: 18,
+    padding: 16,
+    borderRadius: 14,
+    background: "rgba(239,68,68,0.1)",
+    border: "1px solid rgba(239,68,68,0.3)",
+    color: "#fca5a5",
+    overflowWrap: "anywhere",
+  };
+
+  return {
+    page,
+    top,
+    eyebrow,
+    title,
+    muted,
+    refresh,
+    grid,
+    card,
+    number,
+    errorBox,
+  };
+}
