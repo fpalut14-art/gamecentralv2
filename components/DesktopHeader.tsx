@@ -35,6 +35,10 @@ export default function DesktopHeader({
 }: Props) {
   const unreadCount = notifications.filter((item) => !item.read).length;
 
+  const role = String(profile?.role || "").toLowerCase();
+  const isAdmin = role === "admin";
+  const isSeller = role === "seller" || isAdmin;
+
   return (
     <header className="gc-desktop-header">
       <div className="gc-header-left">
@@ -53,6 +57,18 @@ export default function DesktopHeader({
       </div>
 
       <nav className="gc-header-nav">
+        {isAdmin && (
+          <Link href="/admin" className="gc-header-link gc-admin-link">
+            Admin
+          </Link>
+        )}
+
+        {isSeller && (
+          <Link href="/seller" className="gc-header-link gc-seller-link">
+            Satıcı
+          </Link>
+        )}
+
         <Link href="/messages" className="gc-header-link">
           Mesajlar
         </Link>
@@ -96,18 +112,6 @@ export default function DesktopHeader({
         {user && (
           <Link href="/profile" className="gc-header-link gc-profile-link">
             {profile?.name || profile?.email || user.email || "Profil"}
-          </Link>
-        )}
-
-        {(profile?.role === "seller" || profile?.role === "admin") && (
-          <Link href="/seller" className="gc-header-link gc-seller-link">
-            Satıcı
-          </Link>
-        )}
-
-        {profile?.role === "admin" && (
-          <Link href="/admin" className="gc-header-link gc-admin-link">
-            Admin
           </Link>
         )}
 
