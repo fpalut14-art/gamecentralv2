@@ -18,10 +18,12 @@ import MobileHeader from "./MobileHeader";
 import MobileBottomActions from "./MobileBottomActions";
 import "./Header.css";
 
+export type UserRole = "admin" | "seller" | "user";
+
 export type UserProfile = {
   email?: string;
   name?: string;
-  role?: "admin" | "seller" | "user";
+  role?: UserRole;
 };
 
 export type NotificationItem = {
@@ -33,6 +35,15 @@ export type NotificationItem = {
   type?: string;
   createdAt?: string;
 };
+
+function normalizeRole(value: unknown): UserRole {
+  const role = String(value || "user").toLowerCase().trim();
+
+  if (role === "admin") return "admin";
+  if (role === "seller") return "seller";
+
+  return "user";
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -49,7 +60,11 @@ export default function Header() {
 
   async function loadNotifications(uid: string) {
     try {
-      const q = query(collection(db, "notifications"), where("userId", "==", uid));
+      const q = query(
+        collection(db, "notifications"),
+        where("userId", "==", uid)
+      );
+
       const snap = await getDocs(q);
 
       const data = snap.docs
@@ -82,7 +97,13 @@ export default function Header() {
         const snap = await getDoc(doc(db, "users", currentUser.uid));
 
         if (snap.exists()) {
-          setProfile(snap.data() as UserProfile);
+          const data = snap.data();
+
+          setProfile({
+            email: data.email || currentUser.email || "",
+            name: data.name || data.username || "",
+            role: normalizeRole(data.role),
+          });
         } else {
           setProfile({
             email: currentUser.email || "",
